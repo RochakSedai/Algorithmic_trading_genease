@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+<div class="row">
+    <div class="col">
+        <div class="container d-flex h-75">
+            <div class="row justify-content-center align-self-center welcome">
+                <div style="height:7px"></div>
+                <h3>Hi User!!</h3>
+                <!-- <div style="width:100%"> -->
+                {% if error %}
+                    <div class="alert alert-danger">
+                        {{ error }}
+                    </div>
+                {% endif %}
+        
+                <form action="backtest" method="POST">
+                    {% csrf_token %}
+                  <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" name="email" class="form-control" id="email" aria-describedby="emailHelp" placeholder="Subscribe with email..." required>
+                  </div>
+                  <!-- <div style="height:7px"></div>
+                  <div class="form-group">
+                    <label for="phone">Phone Number:</label>
+                    <input type="tel" name="ph_no" class="form-control" id="email" aria-describedby="emailHelp" placeholder="Enter your phone number ...." required>
+                  </div>
+                  <div class="form-group">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="notification-type" id="inlineRadio1" value="mail" checked>
+                        <label class="form-check-label" for="inlineRadio1">Email</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="notification-type" id="inlineRadio2" value="sms">
+                        <label class="form-check-label" for="inlineRadio2">SMS</label>
+                    </div>
+        
+                  </div> -->
+                  <div style="height:7px"></div>
+                  <div class="form-group">
+                    <label for="stock">Stock symbol</label>
+                    <input type="text" name="stock" class="form-control" id="stock" aria-describedby="stockHelp" placeholder="Stock symbol" required>
+                  </div>
+                  <div style="height:7px"></div>
+                  <div class="form-group">
+                    <label for="inputState">Trading Strategies</label>
+                    <select id="inputState" class="form-control" name="strategy">
+                    <option selected>Choose...</option>
+                    <option value="SMA">SMA</option>
+                    <option value="MACD">MACD</option>
+                    <option value="RSI">RSI</option>
+              </select>
+                  </div>
+                 
+                 
+                  <div style="height: 10px"></div>
+                  <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+                </div>
+                </div>
+    </div>
+    <div class="col">
+        {% if trading_strategy %}
+        <h1>{{trading_strategy}} Strategy Result</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Stats</th>
+                    <th scope="col">Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row">1</th>
+                    <td>Return Before Optimization</td>
+                    <td>{{Before_return}}</td>
+                </tr>
+                <tr>
+                    <th scope="row">2</th>
+                    <td>Return After Optimization</td>
+                    <td>{{After_return}}</td>
+                </tr>
+                <tr>
+                    <th scope="row">3</th>
+                    <td>Buy and Hold Return</td>
+                    <td>{{Buy_and_Hold_return}}</td>
+                </tr>
+            </tbody>
+        </table>
+        {% endif %}
+    </div>
+</div>
+</div>
+
+        
+
+        {{email}}
+        {{ticker}}
+{% endblock %}
