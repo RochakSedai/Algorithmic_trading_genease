@@ -1,4 +1,8 @@
 from django.shortcuts import render
+from django.template.loader import get_template
+from django.views.generic.base import View
+from django.http import HttpResponse
+from django.contrib import messages
 from backtesting import Backtest, Strategy
 from backtesting.lib import crossover
 from backtesting.test import SMA, GOOG
@@ -6,20 +10,37 @@ import pandas_datareader.data as web
 import datetime as dt
 import yfinance as yf
 import talib
-import sys
+from .checker import check_symbol
 
 # Create your views here.
 def home(request):
     return render(request, 'home.html')
 
+class plot_before(View):
+    @staticmethod
+    def render_html_template():
+        template = get_template('/home/sedairochak/Algorithmic_Trading_Platform/algorithmic_trading/tradingapp/templates/plot_before.html')
+        return template.render()
+    
+
+    def get(self, request):
+        html_content = self.render_html_template()
+        return HttpResponse(html_content)
+
+
+# def plot_before(request):
+#     return render(request, 'plot_before.html')
+
+def plot_after(request):
+    return render(request, 'plot_after.html')
 
 
 # SMA trading strategy
 class MySMAStrategy(Strategy):
     # Define the two MA lags as *class variables*
     # for later optimization
-    n1 = 10
-    n2 = 20
+    n1 =  15
+    n2 = 10
 
     def init(self):
         price = self.data.Close
@@ -70,6 +91,11 @@ def backtest(request):
         email  = content.get('email')
         ticker = content.get('stock')
         trading_strategy = content.get('strategy')
+    
+    result = check_symbol(ticker)
+    if not result:
+        messages.error(request, 'Invalid stock symbol....')
+        return render(request, 'home.html')
 
     print(ticker)
     print(trading_strategy)
@@ -82,6 +108,7 @@ def backtest(request):
         print('Hello')
         backtest_result = Backtest(data, MySMAStrategy, commission=0.002, exclusive_orders=True)
         stats_before = backtest_result.run()
+        backtest_result.plot(filename='/home/sedairochak/Algorithmic_Trading_Platform/algorithmic_trading/tradingapp/templates/plot_before.html')
         print(stats_before)
         print("/////////////////////////////////////////////////////////////////////////////")
         stats_after = backtest_result.optimize(n1=range(5, 30, 5),
@@ -91,7 +118,7 @@ def backtest(request):
         print(stats_after)
         print("-----------------")
         print(stats_after._strategy)
-        print(type(stats_after))
+        backtest_result.plot(filename='/home/sedairochak/Algorithmic_Trading_Platform/algorithmic_trading/tradingapp/templates/plot_after.html')
       
         context = {
             'Before_return' :  stats_before['Return [%]'],
@@ -108,18 +135,32 @@ def backtest(request):
 
     elif trading_strategy == 'RSI':
         backtest_result = Backtest(data, RsiOscillator, commission=0.002, exclusive_orders=True)
-        stats = backtest_result.run()
-        print(stats)
+        stats_before = backtest_result.run()
+        backtest_result.plot(filename='/home/sedairochak/Algorithmic_Trading_Platform/algorithmic_trading/tradingapp/templates/plot_before.html')
+        print(stats_before)
         print("/////////////////////////////////////////////////////////////////////////////")
-        stats = backtest_result.optimize(
+        stats_after = backtest_result.optimize(
             upper_bound = range(55, 85, 5),
             lower_bound = range(10, 85, 5),
             rsi_window = range(10,30,2),
             maximize = 'Equity Final [$]',
             constraint = lambda param: param.lower_bound < param.upper_bound
         )
-        print(stats)
+        print(stats_after)
         print("-----------------")
-        print(stats._strategy)
+        print(stats_after._strategy.upper_bound)
+
+        backtest_result.plot(filename='/home/sedairochak/Algorithmic_Trading_Platform/algorithmic_trading/tradingapp/templates/plot_after.html')
+        
+
+        context = {
+            'Before_return' :  stats_before['Return [%]'],
+            'After_return': stats_after['Return [%]'],
+            'Buy_and_Hold_return': stats_after['Buy & Hold Return [%]'],
+            'trading_strategy': trading_strategy,
+            'Before_equity_final': stats_before['Equity Final [$]'],
+            'After_equity_final': stats_after['Equity Final [$]'],
+            'optimized_parameter': stats_after._strategy,
+        }
 
     return render(request, 'home.html', context)
