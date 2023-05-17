@@ -125,13 +125,24 @@ def backtest(request):
             'After_return': stats_after['Return [%]'],
             'Buy_and_Hold_return': stats_after['Buy & Hold Return [%]'],
             'trading_strategy': trading_strategy,
+            'Before_equity_final': stats_before['Equity Final [$]'],
+            'After_equity_final': stats_after['Equity Final [$]'],
+            'optimized_parameter': stats_after._strategy,
         }
 
     elif trading_strategy ==  'MACD':
         print('HI')
         backtest_result = Backtest(data, MyMACDStrategy, commission=0.002, exclusive_orders=True)
-        stats = backtest_result.run()
-        print(stats)
+        stats_before = backtest_result.run()
+        backtest_result.plot(filename='/home/sedairochak/Algorithmic_Trading_Platform/algorithmic_trading/tradingapp/templates/plot_before.html')
+        print(stats_before)
+
+        context = {
+            'Before_return' :  stats_before['Return [%]'],
+            'Buy_and_Hold_return': stats_before['Buy & Hold Return [%]'],
+            'trading_strategy': trading_strategy,
+            'Before_equity_final': stats_before['Equity Final [$]'],
+        }
 
     elif trading_strategy == 'RSI':
         backtest_result = Backtest(data, RsiOscillator, commission=0.002, exclusive_orders=True)
