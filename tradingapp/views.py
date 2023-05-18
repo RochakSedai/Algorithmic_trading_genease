@@ -16,25 +16,6 @@ from .checker import check_symbol
 def home(request):
     return render(request, 'home.html')
 
-class plot_before(View):
-    @staticmethod
-    def render_html_template():
-        template = get_template('/home/sedairochak/Algorithmic_Trading_Platform/algorithmic_trading/tradingapp/templates/plot_before.html')
-        return template.render()
-    
-
-    def get(self, request):
-        html_content = self.render_html_template()
-        return HttpResponse(html_content)
-
-
-# def plot_before(request):
-#     return render(request, 'plot_before.html')
-
-def plot_after(request):
-    return render(request, 'plot_after.html')
-
-
 # SMA trading strategy
 class MySMAStrategy(Strategy):
     # Define the two MA lags as *class variables*
@@ -86,12 +67,15 @@ class RsiOscillator(Strategy):
 
 
 def backtest(request):
+
+    # getting the form input
     if request.method == 'POST':
         content = request.POST.dict()
         email  = content.get('email')
         ticker = content.get('stock')
         trading_strategy = content.get('strategy')
     
+    # checking whether the ticker symbol is valid or not
     result = check_symbol(ticker)
     if not result:
         messages.error(request, 'Invalid stock symbol....')
@@ -99,18 +83,23 @@ def backtest(request):
 
     print(ticker)
     print(trading_strategy)
+
+    # fetching data from the yfinance api with the respective start and end date
     _start = dt.date(2020, 1, 1)
-    _end = dt.date(2022, 1, 1)
-    # data = web.DataReader(ticker, data_source="yahoo", start=start, end=end)
+    _end = dt.date(2022, 12, 1)
     data = yf.download(ticker, start = _start, end = _end)
 
+    
     if trading_strategy == 'SMA':
         print('Hello')
+        # performing backtesting
         backtest_result = Backtest(data, MySMAStrategy, commission=0.002, exclusive_orders=True)
         stats_before = backtest_result.run()
         backtest_result.plot(filename='/home/sedairochak/Algorithmic_Trading_Platform/algorithmic_trading/tradingapp/templates/plot_before.html')
         print(stats_before)
         print("/////////////////////////////////////////////////////////////////////////////")
+
+        # performing optimization and optimizing Equity Final
         stats_after = backtest_result.optimize(n1=range(5, 30, 5),
                     n2=range(10, 70, 5),
                     maximize='Equity Final [$]',
@@ -120,6 +109,7 @@ def backtest(request):
         print(stats_after._strategy)
         backtest_result.plot(filename='/home/sedairochak/Algorithmic_Trading_Platform/algorithmic_trading/tradingapp/templates/plot_after.html')
       
+      # returning some of the performance metrices in the form of context dictionary
         context = {
             'Before_return' :  stats_before['Return [%]'],
             'After_return': stats_after['Return [%]'],
@@ -132,11 +122,13 @@ def backtest(request):
 
     elif trading_strategy ==  'MACD':
         print('HI')
+        # performing backtesting
         backtest_result = Backtest(data, MyMACDStrategy, commission=0.002, exclusive_orders=True)
         stats_before = backtest_result.run()
         backtest_result.plot(filename='/home/sedairochak/Algorithmic_Trading_Platform/algorithmic_trading/tradingapp/templates/plot_before.html')
         print(stats_before)
 
+        # returning some of the performance metrices in the form of context dictionary
         context = {
             'Before_return' :  stats_before['Return [%]'],
             'Buy_and_Hold_return': stats_before['Buy & Hold Return [%]'],
@@ -145,11 +137,16 @@ def backtest(request):
         }
 
     elif trading_strategy == 'RSI':
+        # performing backtesting
         backtest_result = Backtest(data, RsiOscillator, commission=0.002, exclusive_orders=True)
         stats_before = backtest_result.run()
+
+        # plotting the backtest result in graph
         backtest_result.plot(filename='/home/sedairochak/Algorithmic_Trading_Platform/algorithmic_trading/tradingapp/templates/plot_before.html')
         print(stats_before)
         print("/////////////////////////////////////////////////////////////////////////////")
+
+        # performing optimization and optimizing Equity Final
         stats_after = backtest_result.optimize(
             upper_bound = range(55, 85, 5),
             lower_bound = range(10, 85, 5),
@@ -161,9 +158,10 @@ def backtest(request):
         print("-----------------")
         print(stats_after._strategy.upper_bound)
 
+        #plotting the optimized result in graph
         backtest_result.plot(filename='/home/sedairochak/Algorithmic_Trading_Platform/algorithmic_trading/tradingapp/templates/plot_after.html')
         
-
+        # returning some of the performance metrices in the form of context dictionary
         context = {
             'Before_return' :  stats_before['Return [%]'],
             'After_return': stats_after['Return [%]'],

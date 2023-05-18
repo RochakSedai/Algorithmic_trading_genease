@@ -1,6 +1,6 @@
 # ALGORITHMIC TRADING PLATFORM WITH BACKTESTING AND OPTIMIZATION
 ## Introduction
-The purpose of this project is to develop an algorithmic trading platform that enables users to create, backtest, and optimize trading strategies. The platform will integrate with market data APIs like <a href="https:/finance.yahoo.com/quote/%5EGSPC/history?p=%5EGSPC"> YahooFinance </a> , provide comprehensive backtesting capabilities, and offer optimization  strategy refinement. Alse user will come to know how their strategy return will get higher than the buy and hold method. 
+The purpose of this project is to develop an algorithmic trading platform that enables users to create, backtest, and optimize trading strategies. The platform will integrate with market data APIs like <a href="https:/finance.yahoo.com/quote/%5EGSPC/history?p=%5EGSPC"> YahooFinance </a> , provide comprehensive backtesting capabilities, and offer optimization  strategy refinement. Also user will come to know how their strategy return will get higher than the buy and hold method. 
 
 <b>P.S:<i>  This is just a simple prototype for the given topic</i></b><br>  
 
@@ -8,7 +8,7 @@ The purpose of this project is to develop an algorithmic trading platform that e
 ## System Overview
   1.  Market Data Integration: This component will handle the retrieval and processing of historical and real-time market data from market data APIs <a href="https:/finance.yahoo.com/quote/%5EGSPC/history?p=%5EGSPC"> YahooFinance </a>. It will ensure efficient retrieval of data to support strategy backtesting and optimization.
 
-   2. Backtesting and Optimization Engine: This component will provide the necessary backend functionality to support strategy creation, backtesting against historical data, and paramter optimization for the given strategy. It will leverage historical data to simulate the performance of trading strategies and identify optimal parameter settings.
+   2. Backtesting and Optimization Engine: This component will provide the necessary backend functionality to support strategy creation, backtesting against historical data, and parameter optimization for the given strategy. It will leverage historical data to simulate the performance of trading strategies and identify optimal parameter settings.
 
    3. User Interface: The platform will feature a user-friendly web interface that allows users to define trading strategies using a domain-specific language (DSL). Users will be able to run backtests on historical data, analyze performance metrics and risk statistics, and visualize the results.
 
