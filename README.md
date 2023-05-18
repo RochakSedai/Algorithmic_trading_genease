@@ -26,7 +26,7 @@ Then you navigate to the base directory of the project and install the requireme
 > pip install -r requirements.txt  
 
 Yo can get the build error while installing TA-Lib. You can solve this problem by following these steps in ubuntu terminal.
->wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz\
+>wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz  \
 > tar -xzf ta-lib-0.4.0-src.tar.gz\
 > cd ta-lib/ \
 >sudo ./configure \
